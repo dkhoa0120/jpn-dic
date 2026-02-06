@@ -1,3 +1,5 @@
+import KataFlashList from "./KataFlashList";
+
 export default function KataFlashCardCtn() {
-  return <div>KataFlashCardCtn</div>;
+  return <KataFlashList />;
 }
