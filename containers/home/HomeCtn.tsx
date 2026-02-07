@@ -1,8 +1,10 @@
 "use client";
 
 import { EVocabulary, grammarOptions, vocabularyOptions } from "@/common/types";
+import { Button, Dropdown, MenuProps, Space } from "antd";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { SettingOutlined } from "@ant-design/icons";
 
 function HomeCtn() {
   const router = useRouter();
@@ -23,6 +25,21 @@ function HomeCtn() {
         break;
     }
   };
+
+  const onClick: MenuProps["onClick"] = ({ key }) => {
+    router.push(`/${key}`);
+  };
+
+  const items: MenuProps["items"] = [
+    {
+      label: "Động từ",
+      key: "verb",
+    },
+    {
+      label: "Tính từ",
+      key: "adj",
+    },
+  ];
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden">
@@ -59,10 +76,22 @@ function HomeCtn() {
       {/* Tab Content */}
       <div className="p-8">
         {activeTab === "vocabulary" && (
-          <div>
+          <div className="w-full relative">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-6">
               Chọn loại từ vựng bạn muốn học
             </h2>
+            <div className="flex w-full justify-between items-center mb-6">
+              <span />
+              <Dropdown menu={{ items, onClick }}>
+                <Button>
+                  <Space>
+                    Nâng cao
+                    <SettingOutlined />
+                  </Space>
+                </Button>
+              </Dropdown>
+            </div>
+
             <div className="grid gap-4 md:grid-cols-2">
               {vocabularyOptions.map((option) => (
                 <button

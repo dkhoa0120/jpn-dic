@@ -84,7 +84,7 @@ export default function FlashCardList({ category }: Props) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 mt-4 md:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6  gap-2 mt-4 md:gap-4">
             {vocabularyList.map((item) => (
               <FlashCard key={item.id} vocabulary={item} />
             ))}
@@ -94,9 +94,7 @@ export default function FlashCardList({ category }: Props) {
 
       {/* Pagination - Fixed at bottom */}
       <div className="flex items-center justify-center md:justify-between py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-        <Button size="large" onClick={() => router.push("/")}>
-          🏠 Trang chủ
-        </Button>
+        <span />
         <Pagination
           total={pagination?.total}
           current={pagination?.page}

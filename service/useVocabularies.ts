@@ -12,7 +12,7 @@ type Props = {
 export function useVocabularies({ category }: Props) {
   const [query, setQuery] = useState<VocabularyQuery>({
     page: 1,
-    size: 16,
+    size: 18,
     category: category || ECategory.VocabularyTypeNone,
     topic: ETopic.None,
     search: "",
@@ -33,7 +33,7 @@ export function useVocabularies({ category }: Props) {
   const vocabularyList = vocabulariesData?.data || [];
   const pagination = vocabulariesData?.pagination || {
     page: 1,
-    size: 16,
+    size: 18,
     total: 0,
   };
 
