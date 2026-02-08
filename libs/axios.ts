@@ -5,13 +5,4 @@ export const axiosClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  //   withCredentials: true, // nếu có cookie / auth
 });
-
-// Optional: interceptor gắn token
-// axiosClient.interceptors.request.use((config) => {
-//   const token =
-//     typeof window !== "undefined" ? localStorage.getItem("token") : null;
-//   if (token) config.headers.Authorization = `Bearer ${token}`;
-//   return config;
-// });
