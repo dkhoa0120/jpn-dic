@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { IVocabulary } from "../types/interface-api";
 
 interface FlashCardProps {
   vocabulary: IVocabulary;
+  setTotalScore: Dispatch<SetStateAction<number>>;
+  totalScore: number;
 }
 
-function FlashCard({ vocabulary }: FlashCardProps) {
+function FlashCard({ vocabulary, setTotalScore, totalScore }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [userAnswer, setUserAnswer] = useState("");
-  const [userAnswer2, setUserAnswer2] = useState("");
-  const [score, setScore] = useState(0);
+
   const [isAnswered, setIsAnswered] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
@@ -25,23 +26,21 @@ function FlashCard({ vocabulary }: FlashCardProps) {
     // Chuẩn hóa đáp án (loại bỏ khoảng trắng thừa, chuyển về chữ thường)
     const correctAnswer = vocabulary.name_vi.toLowerCase().trim();
     const answer1 = userAnswer.toLowerCase().trim();
-    const answer2 = userAnswer2.toLowerCase().trim();
 
     // Kiểm tra đáp án
-    const correct = answer1 === correctAnswer || answer2 === correctAnswer;
+    const correct = answer1 === correctAnswer;
 
     setIsCorrect(correct);
     setIsAnswered(true);
 
     if (correct) {
-      setScore(score + 1);
+      setTotalScore(totalScore + 1);
     }
   };
 
   const handleReset = () => {
     setIsFlipped(false);
     setUserAnswer("");
-    setUserAnswer2("");
     setIsAnswered(false);
     setIsCorrect(false);
   };
@@ -75,15 +74,12 @@ function FlashCard({ vocabulary }: FlashCardProps) {
               </p>
               <p className="text-white/80 text-lg mt-4">{vocabulary.name_vi}</p>
 
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleReset();
-                }}
-                className="mt-6 bg-white/20 hover:bg-white/30 px-6 py-2 rounded-full transition-colors"
+              <span
+                onClick={handleFlip}
+                className="mt-6 bg-white/20 hover:bg-white/30 px-6 py-2 rounded-full transition-colors "
               >
-                Thử lại
-              </button>
+                Xem lại
+              </span>
             </div>
           </div>
 
@@ -122,25 +118,10 @@ function FlashCard({ vocabulary }: FlashCardProps) {
                   }`}
                 />
 
-                <input
-                  type="text"
-                  value={userAnswer2}
-                  onChange={(e) => setUserAnswer2(e.target.value)}
-                  placeholder="Đáp án 2"
-                  disabled={isAnswered}
-                  className={`w-full px-4 py-3 rounded-lg text-gray-800 text-center font-medium focus:outline-none focus:ring-2 focus:ring-white/50 ${
-                    isAnswered
-                      ? isCorrect
-                        ? "bg-green-300"
-                        : "bg-red-300"
-                      : "bg-white"
-                  }`}
-                />
-
                 {!isAnswered ? (
                   <button
                     onClick={handleSubmit}
-                    disabled={!userAnswer && !userAnswer2}
+                    disabled={!userAnswer}
                     className="w-full bg-white text-blue-600 font-bold py-3 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Kiểm tra
@@ -152,9 +133,12 @@ function FlashCard({ vocabulary }: FlashCardProps) {
                     >
                       {isCorrect ? "✓ Chính xác!" : "✗ Sai rồi"}
                     </p>
-                    <p className="text-sm text-blue-100">
+                    <p
+                      className="text-sm text-blue-100 cursor-pointer"
+                      onClick={handleFlip}
+                    >
                       {isCorrect
-                        ? "Nhấn vào thẻ để xem lại"
+                        ? "Nhấn vào để xem lại"
                         : `Đáp án đúng: ${vocabulary.name_vi}`}
                     </p>
                   </div>
@@ -167,7 +151,7 @@ function FlashCard({ vocabulary }: FlashCardProps) {
 
       {/* Score Display */}
       <div className="mt-4 text-center text-lg font-semibold text-gray-700 dark:text-gray-300">
-        Điểm: {score}
+        Điểm: {totalScore}
       </div>
     </div>
   );

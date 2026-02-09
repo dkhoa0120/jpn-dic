@@ -12,7 +12,6 @@ import {
   Form,
   Row,
   Col,
-  Drawer,
 } from "antd";
 import type { TextAreaRef } from "antd/es/input/TextArea";
 import {
@@ -74,7 +73,7 @@ export default function DailyEditor({ daily }: Props) {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Handle text selection
+  // Handle text selection - FIXED for mobile
   const handleTextSelection = () => {
     if (!contentRef.current?.resizableTextArea?.textArea) return;
 
@@ -98,8 +97,19 @@ export default function DailyEditor({ daily }: Props) {
 
     // On mobile, auto open add note modal
     if (isMobile) {
-      setShowNoteModal(true);
+      // Small delay to ensure selection is complete
+      setTimeout(() => {
+        setShowNoteModal(true);
+      }, 100);
     }
+  };
+
+  // NEW: Handle touch end for mobile
+  const handleTouchEnd = () => {
+    // Use setTimeout to allow selection to complete
+    setTimeout(() => {
+      handleTextSelection();
+    }, 100);
   };
 
   // Add vocabulary note
@@ -139,7 +149,10 @@ export default function DailyEditor({ daily }: Props) {
   };
 
   // Handle click on vocabulary highlight
-  const handleVocabClick = (e: React.MouseEvent, index: number) => {
+  const handleVocabClick = (
+    e: React.MouseEvent | React.TouchEvent,
+    index: number,
+  ) => {
     const note = vocabularyNotes[index];
 
     if (isMobile) {
@@ -275,6 +288,7 @@ export default function DailyEditor({ daily }: Props) {
               value={content}
               onChange={(e) => setContent(e.target.value)}
               onMouseUp={handleTextSelection}
+              onTouchEnd={handleTouchEnd} // FIXED: Added touch support
               placeholder="Nhập nội dung..."
               rows={25}
               style={{ fontFamily: "monospace" }}
@@ -335,6 +349,14 @@ export default function DailyEditor({ daily }: Props) {
                   if (!isMobile) {
                     setActiveNote(null);
                   }
+                }
+              }}
+              onTouchEnd={(e) => {
+                // FIXED: Added touch support for preview
+                const target = e.target as HTMLElement;
+                if (target.classList.contains("vocab-highlight")) {
+                  const index = parseInt(target.dataset.index || "0");
+                  handleVocabClick(e, index);
                 }
               }}
               dangerouslySetInnerHTML={{
@@ -407,6 +429,7 @@ export default function DailyEditor({ daily }: Props) {
         }}
         footer={null}
         width={isMobile ? "95%" : 500}
+        destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={handleAddNote}>
           <Form.Item
@@ -417,7 +440,7 @@ export default function DailyEditor({ daily }: Props) {
             <Input
               size="large"
               placeholder="Nhập cách đọc / ngữ pháp..."
-              autoFocus
+              autoFocus={!isMobile} // Disable autofocus on mobile to prevent keyboard issues
             />
           </Form.Item>
 
@@ -458,6 +481,7 @@ export default function DailyEditor({ daily }: Props) {
         }}
         footer={null}
         width="95%"
+        destroyOnClose
       >
         {activeNote && (
           <div className="vocab-detail-mobile">
@@ -495,6 +519,8 @@ export default function DailyEditor({ daily }: Props) {
           padding: 2px 4px;
           border-radius: 4px;
           user-select: none;
+          -webkit-user-select: none; /* Safari */
+          -webkit-tap-highlight-color: transparent; /* Remove tap highlight on iOS */
         }
 
         .vocab-highlight:hover {
@@ -607,6 +633,17 @@ export default function DailyEditor({ daily }: Props) {
         /* Mobile Styles */
         .vocab-detail-mobile {
           padding: 8px;
+        }
+
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+          .preview-content {
+            -webkit-overflow-scrolling: touch;
+          }
+
+          textarea {
+            font-size: 16px; /* Prevent zoom on focus in iOS */
+          }
         }
 
         /* Dark mode support */

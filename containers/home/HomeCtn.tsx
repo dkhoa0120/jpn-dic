@@ -71,6 +71,19 @@ function HomeCtn() {
         >
           ✏️ Ngữ pháp
         </button>
+
+        <button
+          onClick={() => router.push(`/dailies`)}
+          className={`flex-1 py-4 px-6 text-center font-semibold transition-colors cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700`}
+        >
+          📝 Nhật ký
+        </button>
+        <button
+          onClick={() => router.push(`/flashcard`)}
+          className={`flex-1 py-4 px-6 text-center font-semibold transition-colors cursor-pointer text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700`}
+        >
+          🎴 Flashcard
+        </button>
       </div>
 
       {/* Tab Content */}

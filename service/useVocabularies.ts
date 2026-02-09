@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 type Props = {
-  category: ECategory;
+  category?: ECategory;
 };
 
 export function useVocabularies({ category }: Props) {
@@ -30,6 +30,15 @@ export function useVocabularies({ category }: Props) {
     placeholderData: (previousData) => previousData,
   });
 
+  const { data: vocabulariesRandomData, isFetching: loadingRandom } = useQuery({
+    queryKey: ["vocabularies"],
+    queryFn: async () => {
+      const res = await vocabulariesDataApi.getRandomVocabularies();
+      return res.data.items;
+    },
+    placeholderData: (previousData) => previousData,
+  });
+
   const vocabularyList = vocabulariesData?.data || [];
   const pagination = vocabulariesData?.pagination || {
     page: 1,
@@ -42,5 +51,7 @@ export function useVocabularies({ category }: Props) {
     pagination,
     loading,
     setQuery,
+    vocabulariesRandomData,
+    loadingRandom,
   };
 }
