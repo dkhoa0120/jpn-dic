@@ -28,6 +28,7 @@ export enum ETopic {
   Sports = "sports",
   TimeDate = "time",
   Feelings = "feelings",
+  Location = "location",
   Other = "other",
 }
 
@@ -76,6 +77,7 @@ export const TOPIC_LABELS: Record<ETopic, string> = {
   [ETopic.Sports]: "Thể thao",
   [ETopic.TimeDate]: "Thời gian",
   [ETopic.Feelings]: "Cảm xúc",
+  [ETopic.Location]: "Địa điểm ",
   [ETopic.Other]: "Khác",
 };
 
@@ -100,6 +102,7 @@ export const TOPIC_ICONS: Record<ETopic, string> = {
   [ETopic.TimeDate]: "⏰",
   [ETopic.Feelings]: "😊",
   [ETopic.Other]: "📦",
+  [ETopic.Location]: "📍",
 };
 
 export const displayedTopics: ETopic[] = [
@@ -121,5 +124,6 @@ export const displayedTopics: ETopic[] = [
   ETopic.Sports,
   ETopic.TimeDate,
   ETopic.Feelings,
+  ETopic.Location,
   ETopic.Other,
 ];

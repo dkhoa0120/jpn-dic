@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   Input,
   Button,
@@ -12,6 +12,7 @@ import {
   Form,
   Row,
   Col,
+  Drawer,
 } from "antd";
 import type { TextAreaRef } from "antd/es/input/TextArea";
 import {
@@ -51,14 +52,27 @@ export default function DailyEditor({ daily }: Props) {
   );
   const [selectedText, setSelectedText] = useState<Selection | null>(null);
   const [showNoteModal, setShowNoteModal] = useState(false);
+  const [showVocabDetailModal, setShowVocabDetailModal] = useState(false);
   const [activeNote, setActiveNote] = useState<{
     note: VocabularyNote;
     index: number;
     position: TooltipPosition;
   } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const contentRef = useRef<TextAreaRef>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // Detect mobile screen
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   // Handle text selection
   const handleTextSelection = () => {
@@ -81,6 +95,11 @@ export default function DailyEditor({ daily }: Props) {
       position: start,
       length: text.length,
     });
+
+    // On mobile, auto open add note modal
+    if (isMobile) {
+      setShowNoteModal(true);
+    }
   };
 
   // Add vocabulary note
@@ -113,6 +132,7 @@ export default function DailyEditor({ daily }: Props) {
       onOk: () => {
         setVocabularyNotes(vocabularyNotes.filter((_, i) => i !== index));
         setActiveNote(null);
+        setShowVocabDetailModal(false);
         message.success("Đã xóa note!");
       },
     });
@@ -120,27 +140,37 @@ export default function DailyEditor({ daily }: Props) {
 
   // Handle click on vocabulary highlight
   const handleVocabClick = (e: React.MouseEvent, index: number) => {
-    const target = e.target as HTMLElement;
-    const rect = target.getBoundingClientRect();
-    const previewRect = previewRef.current?.getBoundingClientRect();
-
-    if (!previewRect) return;
-
-    // Calculate position relative to preview container
-    const top = rect.top - previewRect.top - 10; // 10px above the word
-    const left = rect.left - previewRect.left + rect.width / 2; // Center of the word
-
     const note = vocabularyNotes[index];
 
-    // Toggle: if clicking the same word, close tooltip
-    if (activeNote?.index === index) {
-      setActiveNote(null);
-    } else {
+    if (isMobile) {
+      // Mobile: Show modal
       setActiveNote({
         note,
         index,
-        position: { top, left },
+        position: { top: 0, left: 0 },
       });
+      setShowVocabDetailModal(true);
+    } else {
+      // Desktop: Show tooltip
+      const target = e.target as HTMLElement;
+      const rect = target.getBoundingClientRect();
+      const previewRect = previewRef.current?.getBoundingClientRect();
+
+      if (!previewRect) return;
+
+      const top = rect.top - previewRect.top - 10;
+      const left = rect.left - previewRect.left + rect.width / 2;
+
+      // Toggle: if clicking the same word, close tooltip
+      if (activeNote?.index === index) {
+        setActiveNote(null);
+      } else {
+        setActiveNote({
+          note,
+          index,
+          position: { top, left },
+        });
+      }
     }
   };
 
@@ -250,8 +280,8 @@ export default function DailyEditor({ daily }: Props) {
               style={{ fontFamily: "monospace" }}
             />
 
-            {/* Selection Actions */}
-            {selectedText && (
+            {/* Selection Actions - Always visible on mobile */}
+            {selectedText && !isMobile && (
               <Card
                 size="small"
                 className="mt-4"
@@ -301,8 +331,10 @@ export default function DailyEditor({ daily }: Props) {
                   const index = parseInt(target.dataset.index || "0");
                   handleVocabClick(e, index);
                 } else {
-                  // Click outside vocabulary word, close tooltip
-                  setActiveNote(null);
+                  // Click outside vocabulary word, close tooltip (desktop only)
+                  if (!isMobile) {
+                    setActiveNote(null);
+                  }
                 }
               }}
               dangerouslySetInnerHTML={{
@@ -310,8 +342,8 @@ export default function DailyEditor({ daily }: Props) {
               }}
             />
 
-            {/* Modern Tooltip/Popover */}
-            {activeNote && (
+            {/* Desktop Tooltip */}
+            {!isMobile && activeNote && (
               <div
                 className="vocab-tooltip"
                 style={{
@@ -364,69 +396,17 @@ export default function DailyEditor({ daily }: Props) {
         </Col>
       </Row>
 
-      {/* Vocabulary Notes List */}
-      {/* <Card
-        className="mt-6"
-        title={`📚 Danh sách từ vựng (${vocabularyNotes.length})`}
-      >
-        <Row gutter={[16, 16]}>
-          {vocabularyNotes.length === 0 ? (
-            <Col span={24}>
-              <div className="text-center py-12 text-gray-400">
-                <BookOutlined
-                  style={{ fontSize: "48px", marginBottom: "16px" }}
-                />
-                <p>
-                  Chưa có từ vựng nào. Hãy chọn từ trong nội dung để thêm note!
-                </p>
-              </div>
-            </Col>
-          ) : (
-            vocabularyNotes.map((note, index) => (
-              <Col xs={24} sm={12} lg={8} key={index}>
-                <Card
-                  size="small"
-                  hoverable
-                  className={
-                    activeNote?.index === index ? "active-vocab-card" : ""
-                  }
-                  extra={
-                    <Button
-                      type="text"
-                      danger
-                      size="small"
-                      icon={<DeleteOutlined />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveNote(index);
-                      }}
-                    />
-                  }
-                >
-                  <div className="mb-2">
-                    <h3 className="text-2xl font-bold text-blue-600 m-0">
-                      {note.word}
-                    </h3>
-                  </div>
-                  <p className="text-lg text-gray-700 mb-1">{note.reading}</p>
-                  <p className="text-sm text-gray-600 m-0">{note.meaning}</p>
-                </Card>
-              </Col>
-            ))
-          )}
-        </Row>
-      </Card> */}
-
-      {/* Add Note Modal */}
+      {/* Mobile: Add Note Modal (auto-open on selection) */}
       <Modal
         title={`Thêm note cho: ${selectedText?.text || ""}`}
         open={showNoteModal}
         onCancel={() => {
           setShowNoteModal(false);
           form.resetFields();
+          setSelectedText(null);
         }}
         footer={null}
-        width={500}
+        width={isMobile ? "95%" : 500}
       >
         <Form form={form} layout="vertical" onFinish={handleAddNote}>
           <Form.Item
@@ -455,6 +435,7 @@ export default function DailyEditor({ daily }: Props) {
                 onClick={() => {
                   setShowNoteModal(false);
                   form.resetFields();
+                  setSelectedText(null);
                 }}
               >
                 Hủy
@@ -465,6 +446,43 @@ export default function DailyEditor({ daily }: Props) {
             </Space>
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* Mobile: Vocabulary Detail Modal (instead of tooltip) */}
+      <Modal
+        title="Chi tiết từ vựng"
+        open={isMobile && showVocabDetailModal}
+        onCancel={() => {
+          setShowVocabDetailModal(false);
+          setActiveNote(null);
+        }}
+        footer={null}
+        width="95%"
+      >
+        {activeNote && (
+          <div className="vocab-detail-mobile">
+            <div className="mb-4">
+              <h2 className="text-3xl font-bold text-blue-600 m-0 mb-2">
+                {activeNote.note.word}
+              </h2>
+              <p className="text-xl text-gray-700 mb-2">
+                {activeNote.note.reading}
+              </p>
+              <p className="text-base text-gray-600 mb-4">
+                {activeNote.note.meaning}
+              </p>
+            </div>
+            <Button
+              danger
+              size="large"
+              icon={<DeleteOutlined />}
+              onClick={() => handleRemoveNote(activeNote.index)}
+              block
+            >
+              Xóa note này
+            </Button>
+          </div>
+        )}
       </Modal>
 
       <style jsx global>{`
@@ -491,12 +509,7 @@ export default function DailyEditor({ daily }: Props) {
           box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
         }
 
-        .active-vocab-card {
-          border-color: #1677ff;
-          box-shadow: 0 4px 12px rgba(22, 119, 255, 0.2);
-        }
-
-        /* Modern Tooltip Styles */
+        /* Modern Tooltip Styles (Desktop only) */
         .vocab-tooltip {
           animation: tooltipFadeIn 0.2s ease-out;
           filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.15));
@@ -589,6 +602,11 @@ export default function DailyEditor({ daily }: Props) {
           left: 50%;
           bottom: -2px;
           transform: translateX(-50%);
+        }
+
+        /* Mobile Styles */
+        .vocab-detail-mobile {
+          padding: 8px;
         }
 
         /* Dark mode support */

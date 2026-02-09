@@ -1,6 +1,6 @@
 "use client";
 
-import { ECategory, ETopic } from "@/common/types";
+import { ECategory, ETopic, TOPIC_ICONS, TOPIC_LABELS } from "@/common/types";
 import FIlterTopic from "@/common/ui/FIlterTopic";
 import FlashCard from "@/common/ui/FlashCard";
 import SearchBar from "@/common/ui/SearchBar";
@@ -84,11 +84,69 @@ export default function FlashCardList({ category }: Props) {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6  gap-2 mt-4 md:gap-4">
-            {vocabularyList.map((item) => (
-              <FlashCard key={item.id} vocabulary={item} />
-            ))}
-          </div>
+          <>
+            {/* Desktop Table */}
+            <div className="hidden md:block bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden pt-3">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                    <tr>
+                      <th className="px-6 py-4 text-left font-bold">
+                        Katakana
+                      </th>
+                      <th className="px-6 py-4 text-left font-bold">
+                        Cách đọc
+                      </th>
+                      <th className="px-6 py-4 text-left font-bold">Nghĩa</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {vocabularyList.map((noun, index) => (
+                      <tr
+                        key={index}
+                        className="hover:bg-blue-50 dark:hover:bg-gray-700 transition-colors"
+                      >
+                        <td className="px-6 py-4 text-2xl font-bold text-blue-600 dark:text-blue-400">
+                          {noun.name_jpn}
+                        </td>
+                        <td className="px-6 py-4 text-lg text-gray-700 dark:text-gray-300">
+                          {noun.phonetic}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
+                          {noun.name_vi}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-4 pt-4">
+              {vocabularyList.map((noun, index) => (
+                <div
+                  key={index}
+                  className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-5 hover:shadow-xl transition-shadow"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                        {noun.name_jpn}
+                      </div>
+                      <div className="text-xl text-gray-700 dark:text-gray-300 mb-2">
+                        {noun.phonetic}
+                      </div>
+
+                      <div className="text-gray-600 dark:text-gray-400">
+                        {noun.name_vi}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 

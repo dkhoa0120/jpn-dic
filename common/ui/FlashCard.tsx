@@ -9,26 +9,60 @@ interface FlashCardProps {
 
 function FlashCard({ vocabulary }: FlashCardProps) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [userAnswer, setUserAnswer] = useState("");
+  const [userAnswer2, setUserAnswer2] = useState("");
+  const [score, setScore] = useState(0);
+  const [isAnswered, setIsAnswered] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
 
   const handleFlip = () => {
-    setIsFlipped(!isFlipped);
+    if (isAnswered) {
+      setIsFlipped(!isFlipped);
+    }
+  };
+
+  const handleSubmit = () => {
+    // Chuẩn hóa đáp án (loại bỏ khoảng trắng thừa, chuyển về chữ thường)
+    const correctAnswer = vocabulary.name_vi.toLowerCase().trim();
+    const answer1 = userAnswer.toLowerCase().trim();
+    const answer2 = userAnswer2.toLowerCase().trim();
+
+    // Kiểm tra đáp án
+    const correct = answer1 === correctAnswer || answer2 === correctAnswer;
+
+    setIsCorrect(correct);
+    setIsAnswered(true);
+
+    if (correct) {
+      setScore(score + 1);
+    }
+  };
+
+  const handleReset = () => {
+    setIsFlipped(false);
+    setUserAnswer("");
+    setUserAnswer2("");
+    setIsAnswered(false);
+    setIsCorrect(false);
   };
 
   return (
     <div className="w-full max-w-lg mx-auto">
       {/* Flash Card */}
-      <div
-        className="relative h-80 cursor-pointer perspective-1000"
-        onClick={handleFlip}
-      >
+      <div className="relative h-80 perspective-1000" onClick={handleFlip}>
         <div
           className="relative w-full h-full transition-transform duration-500"
           style={{
             transformStyle: "preserve-3d",
             transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+            pointerEvents: isFlipped ? "none" : "auto",
           }}
         >
-          <div className="absolute w-full h-full backface-hidden rotate-y-180">
+          {/* Mặt sau (Back) - Hiển thị khi flip */}
+          <div
+            className="absolute w-full h-full backface-hidden"
+            style={{ transform: "rotateY(180deg)" }}
+          >
             <div className="h-full bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center text-white">
               <div className="text-sm font-semibold mb-4 bg-white/20 px-4 py-2 rounded-full">
                 {vocabulary.category}
@@ -40,25 +74,101 @@ function FlashCard({ vocabulary }: FlashCardProps) {
                 {vocabulary.phonetic}
               </p>
               <p className="text-white/80 text-lg mt-4">{vocabulary.name_vi}</p>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleReset();
+                }}
+                className="mt-6 bg-white/20 hover:bg-white/30 px-6 py-2 rounded-full transition-colors"
+              >
+                Thử lại
+              </button>
             </div>
           </div>
 
+          {/* Mặt trước (Front) */}
           <div className="absolute w-full h-full backface-hidden">
             <div className="h-full bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center text-white">
-              <div className="text-sm font-semibold mb-2 bg-white/20 px-4 py-2 rounded-full">
+              <div className="text-sm font-semibold mb-4 bg-white/20 px-4 py-2 rounded-full">
                 {vocabulary.topic}
               </div>
-              <h2 className="text-4xl font-bold mb-4 text-center">
-                {vocabulary.name_vi}
+
+              <h2 className="text-5xl font-bold mb-6 text-center">
+                {vocabulary.name_jpn}
               </h2>
-              <p className="text-blue-100 text-sm">Nhấn để xem tiếng Nhật</p>
+
+              <p className="text-blue-100 text-sm mb-4">
+                Nghĩa tiếng Việt là gì?
+              </p>
+
+              {/* Input fields */}
+              <div
+                className="w-full max-w-xs space-y-3"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <input
+                  type="text"
+                  value={userAnswer}
+                  onChange={(e) => setUserAnswer(e.target.value)}
+                  placeholder="Đáp án 1"
+                  disabled={isAnswered}
+                  className={`w-full px-4 py-3 rounded-lg text-gray-800 text-center font-medium focus:outline-none focus:ring-2 focus:ring-white/50 ${
+                    isAnswered
+                      ? isCorrect
+                        ? "bg-green-300"
+                        : "bg-red-300"
+                      : "bg-white"
+                  }`}
+                />
+
+                <input
+                  type="text"
+                  value={userAnswer2}
+                  onChange={(e) => setUserAnswer2(e.target.value)}
+                  placeholder="Đáp án 2"
+                  disabled={isAnswered}
+                  className={`w-full px-4 py-3 rounded-lg text-gray-800 text-center font-medium focus:outline-none focus:ring-2 focus:ring-white/50 ${
+                    isAnswered
+                      ? isCorrect
+                        ? "bg-green-300"
+                        : "bg-red-300"
+                      : "bg-white"
+                  }`}
+                />
+
+                {!isAnswered ? (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!userAnswer && !userAnswer2}
+                    className="w-full bg-white text-blue-600 font-bold py-3 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Kiểm tra
+                  </button>
+                ) : (
+                  <div className="text-center">
+                    <p
+                      className={`text-lg font-bold mb-2 ${isCorrect ? "text-green-200" : "text-red-200"}`}
+                    >
+                      {isCorrect ? "✓ Chính xác!" : "✗ Sai rồi"}
+                    </p>
+                    <p className="text-sm text-blue-100">
+                      {isCorrect
+                        ? "Nhấn vào thẻ để xem lại"
+                        : `Đáp án đúng: ${vocabulary.name_vi}`}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Progress Indicator (Optional) */}
-      <div className="mt-4 text-center text-sm text-gray-600 dark:text-gray-400"></div>
+      {/* Score Display */}
+      <div className="mt-4 text-center text-lg font-semibold text-gray-700 dark:text-gray-300">
+        Điểm: {score}
+      </div>
     </div>
   );
 }
