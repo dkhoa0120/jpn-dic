@@ -65,7 +65,7 @@ export default function DailyEditor({ daily }: Props) {
   // Detect mobile screen
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < 1280);
     };
 
     checkMobile();
@@ -124,7 +124,9 @@ export default function DailyEditor({ daily }: Props) {
       length: selectedText.length,
     };
 
-    setVocabularyNotes([...vocabularyNotes, newNote]);
+    setVocabularyNotes(
+      [...vocabularyNotes, newNote].sort((a, b) => a.position - b.position),
+    );
     message.success("Đã thêm note cho từ vựng!");
     setShowNoteModal(false);
     form.resetFields();
@@ -189,32 +191,37 @@ export default function DailyEditor({ daily }: Props) {
 
   // Render content with highlights
   const renderContentWithHighlights = () => {
-    if (vocabularyNotes.length === 0) {
-      return content;
-    }
-
+    // Sort DESC để replace từ cuối lên đầu (tránh position shift)
     const sortedNotes = [...vocabularyNotes].sort(
       (a, b) => b.position - a.position,
     );
 
+    // Create index map to track original position
+    const indexMap = new Map();
+    vocabularyNotes.forEach((note, idx) => {
+      indexMap.set(note, idx);
+    });
+
+    console.log("vocabularyNotes", vocabularyNotes);
+    console.log("map", indexMap);
+
     let result = content;
-    sortedNotes.forEach((note, index) => {
+
+    sortedNotes.forEach((note) => {
+      const originalIndex = indexMap.get(note); // Get correct index
+
       const before = result.substring(0, note.position);
       const word = result.substring(note.position, note.position + note.length);
       const after = result.substring(note.position + note.length);
 
-      const originalIndex = vocabularyNotes.length - 1 - index;
-      const isActive = activeNote?.index === originalIndex;
-
       result = `${before}<span 
-        class="vocab-highlight ${isActive ? "active" : ""}" 
-        data-index="${originalIndex}"
-      >${word}</span>${after}`;
+      class="vocab-highlight" 
+      data-index="${originalIndex}"
+    >${word}</span>${after}`;
     });
 
     return result;
   };
-
   // Save daily
   const handleSave = async () => {
     if (!title.trim()) {
