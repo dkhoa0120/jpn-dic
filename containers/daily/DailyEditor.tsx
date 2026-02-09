@@ -96,7 +96,7 @@ export default function DailyEditor({ daily }: Props) {
     });
 
     // On mobile, auto open add note modal
-    if (isMobile) {
+    if (isMobile && selectedText !== null) {
       // Small delay to ensure selection is complete
       setTimeout(() => {
         setShowNoteModal(true);
@@ -238,6 +238,19 @@ export default function DailyEditor({ daily }: Props) {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelAddNote = () => {
+    setShowNoteModal(false);
+    form.resetFields();
+    setSelectedText(null);
+
+    // Clear textarea selection
+    if (contentRef.current?.resizableTextArea?.textArea) {
+      const textarea = contentRef.current.resizableTextArea.textArea;
+      textarea.blur();
+      textarea.setSelectionRange(0, 0);
     }
   };
 
@@ -454,15 +467,7 @@ export default function DailyEditor({ daily }: Props) {
 
           <Form.Item className="mb-0">
             <Space style={{ width: "100%", justifyContent: "flex-end" }}>
-              <Button
-                onClick={() => {
-                  setShowNoteModal(false);
-                  form.resetFields();
-                  setSelectedText(null);
-                }}
-              >
-                Hủy
-              </Button>
+              <Button onClick={handleCancelAddNote}>Hủy</Button>
               <Button type="primary" htmlType="submit">
                 Thêm
               </Button>
