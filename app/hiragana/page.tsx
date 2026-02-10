@@ -1,9 +1,9 @@
-import HiraFlashCardCtn from "@/containers/hiragana/FlashCard/HiraFlashCardCtn";
+import HiraListCtn from "@/containers/hiragana/KataListCtn";
 
 export const page = () => {
   return (
     <div className="pb-[10px] md:pb-0">
-      <HiraFlashCardCtn />
+      <HiraListCtn />
     </div>
   );
 };

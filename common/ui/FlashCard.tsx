@@ -107,7 +107,7 @@ function FlashCard({ vocabulary, setTotalScore, totalScore }: FlashCardProps) {
                   type="text"
                   value={userAnswer}
                   onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder="Đáp án 1"
+                  placeholder="Đáp án"
                   disabled={isAnswered}
                   className={`w-full px-4 py-3 rounded-lg text-gray-800 text-center font-medium focus:outline-none focus:ring-2 focus:ring-white/50 ${
                     isAnswered

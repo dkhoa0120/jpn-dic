@@ -81,6 +81,13 @@ export const TOPIC_LABELS: Record<ETopic, string> = {
   [ETopic.Other]: "Khác",
 };
 
+export const TOPIC_OPTIONS = Object.entries(TOPIC_LABELS).map(
+  ([value, label]) => ({
+    value: String(value),
+    label: String(label),
+  }),
+);
+
 // Icons for topics (optional)
 export const TOPIC_ICONS: Record<ETopic, string> = {
   [ETopic.None]: "🏠",
