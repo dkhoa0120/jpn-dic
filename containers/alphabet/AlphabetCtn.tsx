@@ -2,6 +2,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import kanaData from "./kana-data.json";
+import { useSearchParams } from "next/navigation";
 
 interface KanaChar {
   romaji: string;
@@ -12,9 +13,11 @@ interface KanaChar {
 type Mode = "hiragana" | "katakana";
 
 export default function AlphabetCtn() {
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type") as Mode;
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [isFlipped, setIsFlipped] = useState<boolean>(false);
-  const [mode, setMode] = useState<Mode>("hiragana");
+  const [mode, setMode] = useState<Mode>(type);
   const [showRomaji, setShowRomaji] = useState<boolean>(false);
   const [shuffled, setShuffled] = useState<boolean>(false);
   const [cards, setCards] = useState<KanaChar[]>(kanaData as KanaChar[]);
@@ -229,32 +232,6 @@ export default function AlphabetCtn() {
               width: `${((currentIndex + 1) / cards.length) * 100}%`,
             }}
           />
-        </div>
-
-        {/* Instructions */}
-        <div className="mt-8 bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
-          <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-4">
-            📖 Hướng dẫn sử dụng
-          </h3>
-          <ul className="space-y-2 text-gray-600 dark:text-gray-300">
-            <li>
-              • <strong>Click card</strong> hoặc nhấn{" "}
-              <strong>Space/Enter</strong> để lật thẻ
-            </li>
-            <li>
-              • Nhấn <strong>← →</strong> để chuyển thẻ trước/sau
-            </li>
-            <li>
-              • Chọn <strong>Hiragana</strong> hoặc <strong>Katakana</strong> để
-              học bảng chữ tương ứng
-            </li>
-            <li>
-              • Bật <strong>Show Romaji</strong> để hiện cách đọc trên mặt trước
-            </li>
-            <li>
-              • Bật <strong>Shuffle</strong> để xáo trộn thứ tự thẻ
-            </li>
-          </ul>
         </div>
       </div>
 

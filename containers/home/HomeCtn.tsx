@@ -180,7 +180,7 @@ function HomeCtn() {
             </h2>
             <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
               <button
-                onClick={() => router.push("/alphabet/hiragana")}
+                onClick={() => router.push("/alphabet?type=hiragana")}
                 className="p-4 sm:p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md transition-all cursor-pointer text-left"
               >
                 <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
@@ -200,7 +200,7 @@ function HomeCtn() {
               </button>
 
               <button
-                onClick={() => router.push("/alphabet/katakana")}
+                onClick={() => router.push("/alphabet?type=katakana")}
                 className="p-4 sm:p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-purple-300 dark:hover:border-purple-500 hover:shadow-md transition-all cursor-pointer text-left"
               >
                 <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
@@ -216,29 +216,6 @@ function HomeCtn() {
                 </div>
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                   Bảng chữ Katakana dùng cho từ ngoại lai
-                </p>
-              </button>
-
-              <button
-                onClick={() => router.push("/alphabet/combined")}
-                className="p-4 sm:p-6 border-2 border-gray-200 dark:border-gray-600 rounded-xl hover:border-green-300 dark:hover:border-green-500 hover:shadow-md transition-all cursor-pointer text-left sm:col-span-2"
-              >
-                <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
-                  <div className="flex gap-2 text-3xl sm:text-4xl">
-                    <span>あ</span>
-                    <span>ア</span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-base sm:text-lg text-gray-800 dark:text-gray-100">
-                      Flashcard kết hợp
-                    </h3>
-                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                      Luyện tập cả Hiragana và Katakana
-                    </p>
-                  </div>
-                </div>
-                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                  Học cả hai bảng chữ cùng lúc với flashcard 3D
                 </p>
               </button>
             </div>

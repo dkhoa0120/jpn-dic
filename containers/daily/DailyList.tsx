@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   Button,
@@ -13,6 +13,7 @@ import {
   message,
   Row,
   Col,
+  Spin,
 } from "antd";
 import {
   PlusOutlined,
@@ -40,6 +41,8 @@ export default function DailyList() {
   const filteredDailies = dailies.filter((daily) =>
     daily.title.toLowerCase().includes(searchTerm.toLowerCase()),
   );
+
+  const [loadingData, setLoadingData] = useState(true);
 
   console.log("dailies", dailies);
 
@@ -78,6 +81,12 @@ export default function DailyList() {
     });
   };
 
+  useEffect(() => {
+    setTimeout(() => {
+      setLoadingData(false);
+    }, 3200);
+  }, []);
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       {/* Header */}
@@ -106,7 +115,11 @@ export default function DailyList() {
       </Card>
 
       {/* Grid Layout */}
-      {filteredDailies.length === 0 ? (
+      {loadingData ? (
+        <div className="flex items-center justify-center pt-20">
+          <Spin />{" "}
+        </div>
+      ) : filteredDailies.length === 0 ? (
         <Card>
           <Empty
             description="Chưa có daily nào"
