@@ -33,6 +33,7 @@ export default function VocabularyList({ category }: Props) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<ETopic>(ETopic.None);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showIdMobile, setShowIdMobile] = useState<string>("");
 
   useEffect(() => {
     const checkMobile = () => {
@@ -199,15 +200,26 @@ export default function VocabularyList({ category }: Props) {
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div className="flex-1">
-                          <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                          <div
+                            className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-2"
+                            onClick={() => setShowIdMobile(noun.id)}
+                          >
                             {noun.name_jpn}
                           </div>
-                          <div className="text-xl text-gray-700 dark:text-gray-300 mb-2">
-                            {noun.phonetic}
-                          </div>
-                          <div className="text-gray-600 dark:text-gray-400 capitalize">
-                            {noun.name_vi}
-                          </div>
+                          {showIdMobile === noun.id && (
+                            <>
+                              {" "}
+                              <div className="text-xl text-gray-700 dark:text-gray-300 mb-2">
+                                {noun.phonetic}
+                              </div>
+                              <div className="text-gray-600 dark:text-gray-400 capitalize">
+                                {noun.name_vi}
+                              </div>
+                              <Button onClick={() => setShowIdMobile("")}>
+                                Ẩn
+                              </Button>
+                            </>
+                          )}
                         </div>
                         <Button
                           type="text"
