@@ -67,24 +67,24 @@ export default function VocabularyList({ category }: Props) {
     }));
   };
 
-  const handleDelete = (id: string, name: string) => {
-    Modal.confirm({
-      title: "Xác nhận xóa",
-      icon: <ExclamationCircleOutlined />,
-      content: `Bạn có chắc chắn muốn xóa từ vựng "${name}"?`,
-      okText: "Xóa",
-      okType: "danger",
-      cancelText: "Hủy",
-      onOk: () => {
-        setDeletingId(id);
-        deleteVocabulary(id, {
-          onSettled: () => {
-            setDeletingId(null);
-          },
-        });
-      },
-    });
-  };
+  // const handleDelete = (id: string, name: string) => {
+  //   Modal.confirm({
+  //     title: "Xác nhận xóa",
+  //     icon: <ExclamationCircleOutlined />,
+  //     content: `Bạn có chắc chắn muốn xóa từ vựng "${name}"?`,
+  //     okText: "Xóa",
+  //     okType: "danger",
+  //     cancelText: "Hủy",
+  //     onOk: () => {
+  //       setDeletingId(id);
+  //       deleteVocabulary(id, {
+  //         onSettled: () => {
+  //           setDeletingId(null);
+  //         },
+  //       });
+  //     },
+  //   });
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8 flex flex-col">
@@ -179,9 +179,9 @@ export default function VocabularyList({ category }: Props) {
                                 danger
                                 icon={<DeleteOutlined />}
                                 loading={isDeleting && deletingId === noun.id}
-                                onClick={() =>
-                                  handleDelete(noun.id!, noun.name_vi)
-                                }
+                                // onClick={() =>
+                                //   handleDelete(noun.id!, noun.name_vi)
+                                // }
                               />
                             </td>
                           </tr>
@@ -226,7 +226,7 @@ export default function VocabularyList({ category }: Props) {
                           danger
                           icon={<DeleteOutlined />}
                           loading={isDeleting && deletingId === noun.id}
-                          onClick={() => handleDelete(noun.id!, noun.name_vi)}
+                          // onClick={() => handleDelete(noun.id!, noun.name_vi)}
                         />
                       </div>
                     </div>

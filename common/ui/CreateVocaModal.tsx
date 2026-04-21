@@ -23,18 +23,18 @@ export default function CreateVocaModal({
     phonetic: string;
     topic: ETopic;
   }) => {
-    createVocabulary(
-      {
-        ...values,
-        category: category,
-      },
-      {
-        onSuccess: () => {
-          setShowCreateModal(false);
-          form.resetFields();
-        },
-      },
-    );
+    // createVocabulary(
+    //   {
+    //     ...values,
+    //     category: category,
+    //   },
+    //   {
+    //     onSuccess: () => {
+    //       setShowCreateModal(false);
+    //       form.resetFields();
+    //     },
+    //   },
+    // );
   };
 
   return (
