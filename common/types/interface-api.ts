@@ -7,6 +7,7 @@ export interface IVocabulary {
   phonetic: string;
   category: string;
   topic: string;
+  sub_category?: string; // e.g., 'group1', 'group2', 'group3' for verbs, 'i', 'na' for adjectives
 }
 
 export interface VocabularyQuery {
@@ -15,6 +16,7 @@ export interface VocabularyQuery {
   category: ECategory;
   topic: ETopic;
   search: string;
+  sub_category?: string;
 }
 
 export interface IPagination {

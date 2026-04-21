@@ -7,6 +7,9 @@ export enum ECategory {
   VocabularyTypeNone = "",
   VocabularyTypeKatakana = "ktkn",
   VocabularyTypeHiragana = "hrgn",
+  Noun = "noun",
+  Verb = "verb",
+  Adjective = "adj",
 }
 
 export enum ETopic {

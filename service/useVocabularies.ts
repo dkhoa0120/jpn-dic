@@ -1,86 +1,81 @@
-import { vocabulariesDataApi } from "@/api";
 import { ECategory, ETopic } from "@/common/types";
-import { VocabularyQuery } from "@/common/types/interface-api";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { message } from "antd";
+import { IVocabulary, VocabularyQuery } from "@/common/types/interface-api";
+import { useEffect, useMemo, useState } from "react";
+import { MOCK_VOCABULARIES } from "@/common/data/vocabularies";
 
 type Props = {
   category?: ECategory;
 };
 
 export function useVocabularies({ category }: Props) {
-  const queryClient = useQueryClient();
   const [query, setQuery] = useState<VocabularyQuery>({
     page: 1,
     size: 18,
     category: category || ECategory.VocabularyTypeNone,
     topic: ETopic.None,
     search: "",
+    sub_category: "",
   });
 
-  const { data: vocabulariesData, isFetching: loading } = useQuery({
-    queryKey: ["vocabularies", query],
-    queryFn: async () => {
-      const res = await vocabulariesDataApi.getVocabularies(query);
-      return {
-        data: res.data.items,
-        pagination: res.data.pagination,
-      };
-    },
-    placeholderData: (previousData) => previousData,
-  });
+  // Filter mock data based on query (basic implementation)
+  const filteredData = useMemo(() => {
+    return MOCK_VOCABULARIES.filter((item) => {
+      // Filter by main category if provided
+      if (query.category && item.category !== query.category) {
+        return false;
+      }
 
-  const { data: vocabulariesRandomData, isFetching: loadingRandom } = useQuery({
-    queryKey: ["vocabularies-random"],
-    queryFn: async () => {
-      const res = await vocabulariesDataApi.getRandomVocabularies();
-      return res.data.items;
-    },
-    placeholderData: (previousData) => previousData,
-  });
+      // Filter by sub_category if provided
+      if (query.sub_category && item.sub_category !== query.sub_category) {
+        return false;
+      }
 
-  // Create mutation
-  const createMutation = useMutation({
-    mutationFn: vocabulariesDataApi.createVocabulary,
-    onSuccess: () => {
-      message.success("Tạo từ vựng thành công!");
-      queryClient.invalidateQueries({ queryKey: ["vocabularies"] });
-    },
-    onError: (error: Error) => {
-      message.error(error.message || "Lỗi khi tạo từ vựng!");
-    },
-  });
+      if (query.search) {
+        return (
+          item.name_vi.toLowerCase().includes(query.search.toLowerCase()) ||
+          item.name_jpn.toLowerCase().includes(query.search.toLowerCase())
+        );
+      }
+      return true;
+    });
+  }, [query.category, query.sub_category, query.search]);
 
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: vocabulariesDataApi.deleteVocabulary,
-    onSuccess: () => {
-      message.success("Xóa từ vựng thành công!");
-      queryClient.invalidateQueries({ queryKey: ["vocabularies"] });
-    },
-    onError: (error: Error) => {
-      message.error(error.message || "Lỗi khi xóa từ vựng!");
-    },
-  });
+  const vocabularyList = useMemo(() => {
+    return filteredData.slice(
+      (query.page - 1) * query.size,
+      query.page * query.size,
+    );
+  }, [filteredData, query.page, query.size]);
 
-  const vocabularyList = vocabulariesData?.data || [];
-  const pagination = vocabulariesData?.pagination || {
-    page: 1,
-    size: 18,
-    total: 0,
+  const pagination = {
+    page: query.page,
+    size: query.size,
+    total: filteredData.length,
   };
+
+  const [vocabulariesRandomData, setVocabulariesRandomData] = useState<
+    IVocabulary[]
+  >([]);
+
+  useEffect(() => {
+    // Shuffling when filtered data changes
+    const setVol = () => {
+      const shuffled = [...filteredData].sort(() => Math.random() - 0.5);
+      setVocabulariesRandomData(shuffled);
+    };
+    setVol();
+  }, [filteredData]);
 
   return {
     vocabularyList,
     pagination,
-    loading,
+    loading: false,
     setQuery,
     vocabulariesRandomData,
-    loadingRandom,
-    createVocabulary: createMutation.mutate,
-    isCreating: createMutation.isPending,
-    deleteVocabulary: deleteMutation.mutate,
-    isDeleting: deleteMutation.isPending,
+    loadingRandom: false,
+    createVocabulary: () => {},
+    isCreating: false,
+    deleteVocabulary: () => {},
+    isDeleting: false,
   };
 }
